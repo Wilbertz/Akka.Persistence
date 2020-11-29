@@ -1,10 +1,11 @@
 ﻿using System;
 using Akka.Actor;
+using Akka.Persistence;
 using GameConsole.ActorModel.Messages;
 
 namespace GameConsole.ActorModel.Actors
 {
-    class PlayerActor : ReceiveActor
+    class PlayerActor : ReceivePersistentActor
     {
         private readonly string _playerName;
         private int _health;        
@@ -16,16 +17,29 @@ namespace GameConsole.ActorModel.Actors
 
             DisplayHelper.WriteLine($"{_playerName} created");
 
-            Receive<HitMessage>(message => HitPlayer(message));
-            Receive<DisplayStatusMessage>(message => DisplayPlayerStatus());
-            Receive<CauseErrorMessage>(message => SimulateError());
+            Command<HitMessage>(message => HitPlayer(message));
+            Command<DisplayStatusMessage>(message => DisplayPlayerStatus());
+            Command<CauseErrorMessage>(message => SimulateError());
+
+            Recover<HitMessage>(message =>
+            {
+                DisplayHelper.WriteLine($"{_playerName} replaying HitMessage {message} from journal, updating actor state");
+                _health -= message.Damage;
+            });
         }
+
+        public override string PersistenceId => $"player-{_playerName}";
 
         private void HitPlayer(HitMessage message)
         {
             DisplayHelper.WriteLine($"{_playerName} received HitMessage");
+            DisplayHelper.WriteLine($"{_playerName} persisting HitMessage");
 
-            _health -= message.Damage;
+            Persist(message, m =>
+            {
+                DisplayHelper.WriteLine($"{_playerName} persisted HitMessage ok, updating actor state");
+                _health -= message.Damage;
+            });
         }
 
         private void DisplayPlayerStatus()
