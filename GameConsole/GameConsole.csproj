@@ -75,12 +75,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActorModel\Messages\CauseErrorMessage.cs" />
-    <Compile Include="ActorModel\Messages\CreatePlayerMessage.cs" />
-    <Compile Include="ActorModel\Messages\DisplayStatusMessage.cs" />
+    <Compile Include="ActorModel\Commands\SimulateError.cs" />
+    <Compile Include="ActorModel\Commands\CreatePlayer.cs" />
+    <Compile Include="ActorModel\Commands\DisplayStatus.cs" />
     <Compile Include="ActorModel\Actors\PlayerActor.cs" />
     <Compile Include="ActorModel\Actors\PlayerCoordinatorActor.cs" />
-    <Compile Include="ActorModel\Messages\HitMessage.cs" />
+    <Compile Include="ActorModel\Commands\HitPlayer.cs" />
+    <Compile Include="ActorModel\Events\PlayerCreated.cs" />
+    <Compile Include="ActorModel\Events\PlayerHit.cs" />
     <Compile Include="DisplayHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -3,7 +3,7 @@ using System.Threading;
 using static System.Console;
 using Akka.Actor;
 using GameConsole.ActorModel.Actors;
-using GameConsole.ActorModel.Messages;
+using GameConsole.ActorModel.Commands;
 
 namespace GameConsole
 {
@@ -60,24 +60,24 @@ namespace GameConsole
         private static void ErrorPlayer(string playerName)
         {
             System.ActorSelection($"/user/PlayerCoordinator/{playerName}")
-                  .Tell(new CauseErrorMessage());
+                  .Tell(new SimulateError());
         }
 
         private static void DisplayPlayer(string playerName)
         {
             System.ActorSelection($"/user/PlayerCoordinator/{playerName}")
-                  .Tell(new DisplayStatusMessage());
+                  .Tell(new DisplayStatus());
         }
 
         private static void HitPlayer(string playerName, int damage)
         {
             System.ActorSelection($"/user/PlayerCoordinator/{playerName}")
-                  .Tell(new HitMessage(damage));
+                  .Tell(new HitPlayer(damage));
         }
 
         private static void CreatePlayer(string playerName)
         {
-            PlayerCoordinator.Tell(new CreatePlayerMessage(playerName));
+            PlayerCoordinator.Tell(new CreatePlayer(playerName));
         }
 
         private static void DisplayInstructions()

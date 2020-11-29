@@ -1,6 +1,7 @@
 using Akka.Actor;
 using Akka.Persistence;
-using GameConsole.ActorModel.Messages;
+using GameConsole.ActorModel.Commands;
+using GameConsole.ActorModel.Events;
 
 namespace GameConsole.ActorModel.Actors
 {
@@ -12,27 +13,29 @@ namespace GameConsole.ActorModel.Actors
 
         public PlayerCoordinatorActor()
         {
-            Command<CreatePlayerMessage>(message =>
+            Command<CreatePlayer>(command =>
             {
-                DisplayHelper.WriteLine($"PlayerCoordinatorActor received CreatePlayerMessage for {message.PlayerName}");
+                DisplayHelper.WriteLine($"PlayerCoordinatorActor received CreatePlayer command for {command.PlayerName}");
 
-                Persist(message, createPlayerMessage =>
+                var @event = new PlayerCreated(command.PlayerName);
+
+                Persist(@event, playerCreatedEvent =>
                 {
-                    DisplayHelper.WriteLine($"PlayerCoordinatorActor persisted a CreatePlayerMessage for {message.PlayerName}");
+                    DisplayHelper.WriteLine($"PlayerCoordinatorActor persisted a PlayerCreated event command for {playerCreatedEvent.PlayerName}");
 
                     Context.ActorOf(
                         Props.Create(() =>
-                            new PlayerActor(message.PlayerName, DefaultStartingHealth)), message.PlayerName);
+                            new PlayerActor(playerCreatedEvent.PlayerName, DefaultStartingHealth)), playerCreatedEvent.PlayerName);
                 });
             });
 
-            Recover<CreatePlayerMessage>(createPlayerMessage =>
+            Recover<PlayerCreated>(playerCreatedEvent =>
             {
-                DisplayHelper.WriteLine($"PlayerCoordinatorActor replaying a CreatePlayerMessage for {createPlayerMessage.PlayerName}");
+                DisplayHelper.WriteLine($"PlayerCoordinatorActor replaying a PlayerCreated event command for {playerCreatedEvent.PlayerName}");
 
                 Context.ActorOf(
                     Props.Create(() =>
-                        new PlayerActor(createPlayerMessage.PlayerName, DefaultStartingHealth)), createPlayerMessage.PlayerName);
+                        new PlayerActor(playerCreatedEvent.PlayerName, DefaultStartingHealth)), playerCreatedEvent.PlayerName);
             });
         }
     }
